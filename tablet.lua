@@ -210,11 +210,11 @@ local facings = {
 }
 
 local modules = {
-    serialization = {path = "/lib/serialization.lua", cmd = [=[_G["serialization"] = load(m, "@/lib/serialization.lua")()]=]},
-    nbsPlayer = {path = "/etc/drc-modules/nbsPlayer.lua", cmd = [=[_G["nbsPlayer"] = m]=], link = "https://pastebin.com/raw/cXJMyQjN"},
-    nbsParser = {path = "/etc/drc-modules/nbsParser.lua", cmd = [=[_G["nbsParser"] = m]=], link = "https://pastebin.com/raw/49b4vX4i"},
-    nbsFreqtab = {path = "/etc/drc-modules/nbsFreqtab.lua", cmd = [=[_G["nbsFreqtab"] = m]=], link = "https://pastebin.com/raw/eNPCbmcH"},
-    nbsMain = {path = "/etc/drc-modules/nbsMain.lua", link = "https://pastebin.com/raw/6yKX7jke"}
+    serialization = {path = "/lib/serialization.lua", cmd = [=[_G["serialization"] = load(module, "@/lib/serialization.lua")()]=]},
+    nbsPlayer = {path = "/etc/drc-modules/nbsPlayer.lua", cmd = [=[_G["nbsPlayer"] = module]=], link = "https://raw.githubusercontent.com/ewwhash/DRC/master/modules/NBS/player.lua"},
+    nbsParser = {path = "/etc/drc-modules/nbsParser.lua", cmd = [=[_G["nbsParser"] = module]=], link = "https://raw.githubusercontent.com/ewwhash/DRC/master/modules/NBS/parser.lua"},
+    nbsFreqtab = {path = "/etc/drc-modules/nbsFreqtab.lua", cmd = [=[_G["nbsFreqtab"] = module]=], link = "https://raw.githubusercontent.com/ewwhash/DRC/master/modules/NBS/freqtab.lua"},
+    nbsMain = {path = "/etc/drc-modules/nbsMain.lua", link = "https://raw.githubusercontent.com/ewwhash/DRC/master/modules/NBS/main.lua"}
 }
 
 local history = {}
