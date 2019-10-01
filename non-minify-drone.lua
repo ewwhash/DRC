@@ -62,7 +62,7 @@ local function pair(modemAddress, unpair)
             local data = eeprom_.getData()
             local portCheck = tonumber(data:match(",(%d+)"))
 
-            if portCheck and portCheck >= 1 and portCheck <= 65535 then 
+            if portCheck then 
                 pairedCard, port = data:match("([%w%p+]+),"), portCheck
                 modem.broadcast(1, "Порт: " .. portCheck, data)
                 modem_.open(port)
