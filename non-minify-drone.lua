@@ -9,7 +9,6 @@ if computer_.getArchitecture() == "Lua 5.2" then
     computer_.setArchitecture("Lua 5.3")
 end
 
-module="" 
 local activeSide, activeSlot, port, allModulesReceived, codeExecution, ignore, pairedCard, data, maxModemStrength, maxPacketSize, env = 0, 0, 0, false_, false_, false_, "", "", tonumber_(getDeviceInfo()[modemAddress].width), tonumber_(getDeviceInfo()[modemAddress].capacity) - 128, setmetatable({}, {__index = _G, __metatable = ""})
  
 local function send(...)
@@ -32,7 +31,7 @@ local function concat(tableData)
     return table_.concat(tableData, ",  ")
 end
  
-function print(stderr, ...)
+local function stderrPrint(stderr, ...)
     local tableData = table_.pack(...)
     send("print", stderr, concat(tableData):sub(1, maxPacketSize))
 end
@@ -64,7 +63,6 @@ local function pair(modemAddress, unpair)
 
             if portCheck then 
                 pairedCard, port = data:match("([%w%p+]+),"), portCheck
-                modem.broadcast(1, "Порт: " .. portCheck, data)
                 modem_.open(port)
                 readyState()
             else
@@ -143,22 +141,22 @@ local function safeSelectSlot(slot)
     end
 end
  
-local function safeEnvLoad(code)
-    return load(code, "=stdin", "t", env)
+local function sandboxLoad(code, sandbox)
+    return load(code, "=stdin", "t", not sandbox and env)
 end
  
-local function runCode(code, traceback)
+local function runCode(code, traceback, moduleName)
     if code:sub(1, 1) == "=" then
        code = code:sub(2, #code)
     end
  
-    local chunk, error_ = safeEnvLoad("return " .. code)
+    local chunk, error_ = sandboxLoad("return " .. code, moduleName)
  
     if not chunk then
-        chunk, error_ = safeEnvLoad(code)
+        chunk, error_ = sandboxLoad(code, moduleName)
        
         if not chunk then
-            print(true_, "Syntax error: " .. error_) --Syntax error
+            stderrPrint(true_, moduleName and "Syntax error(" .. moduleName .. "): " .. error_ or "Syntax error: " .. error_)
         end
     end
  
@@ -168,9 +166,9 @@ local function runCode(code, traceback)
         local returnData = table_.pack(xpcall(chunk, debug_.traceback))
  
         if returnData[1] then
-            if returnData.n > 1 then
+            if returnData.n > 1 and not moduleName then
                 table_.remove(returnData, 1)
-                print(false_, table_.unpack(returnData, 1, returnData.n - 1))
+                stderrPrint(false_, table_.unpack(returnData, 1, returnData.n - 1))
             end
         else
             if traceback then
@@ -186,8 +184,8 @@ local function runCode(code, traceback)
                     end
                 end
             end
- 
-            print(true_, "Runtime error: " .. error_)
+            
+            stderrPrint(true_, moduleName and "Runtime error(" .. moduleName .. "): " .. error_ or "Runtime error: " .. error_)
         end
  
         codeExecution = false_
@@ -196,15 +194,13 @@ local function runCode(code, traceback)
     send("r-end")
 end
  
-local function loadModule(code, cmd)
+local function loadModule(name, code, command)
     if not allModulesReceived then
-        if cmd == "end" then
-            allModulesReceived = true
-        elseif cmd then
-            module = code
-            load(cmd)()
+        if command == "end" then
+            allModulesReceived = true_
         else
-            load(code)()
+            module = code
+            runCode(command or code, false_, name)
         end
     end
 end
@@ -236,7 +232,7 @@ function pull(timeout)
             elseif cmd[signal[6]] and not ignore then
                 cmd[signal[6]](table_.unpack(signal, 7, #signal))
             elseif signal[6] == "unpair" then
-                pair(false_, true)
+                pair(false_, true_)
             elseif signal[6] == "strength" then
                 modem_.setStrength(maxModemStrength / 100 * signal[7])
             elseif signal[6] == "interrupt" and codeExecution then
@@ -249,9 +245,10 @@ function pull(timeout)
  
     return table_.unpack(signal, 1, #signal)
 end
- 
+
 function sleep(timeout)
     local deadline = uptime() + checkNumber(timeout, 0)
+
     repeat
         pull(deadline - uptime())
     until uptime() >= deadline
@@ -273,10 +270,10 @@ cmd = {
     runCode = runCode,
     goToMe = goToUser,
     goToCoords = function(x, y, z) move(0, y, 0) move(x, 0, z) move(0, -y, 0) end,
-    module = loadModule
+    loadModule = loadModule
 }
- 
-move, distance, goToUser, slot = move, getDistanceToUser, goToUser, safeSelectSlot
+
+print, move, distance, goToUser, slot = function(...) stderrPrint(false_, ...) end, move, getDistanceToUser, goToUser, safeSelectSlot
  
 modem_.setWakeMessage("shutboot")
 safeSelectSlot(1)
