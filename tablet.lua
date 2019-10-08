@@ -12,7 +12,7 @@ local pairedCard, port = "", 0
 local tablet
 
 if not component.isAvailable("modem") then
-	io.stderr:write("This program requires network card!")
+    io.stderr:write("This program requires network card!")
 end
 if component.isAvailable("tablet") then
     tablet = component.tablet
@@ -150,6 +150,7 @@ local stuff = {
     helpIsDrawed = false,
     hide = false,
     strength = 20,
+    lastError = false,
 
     drone = {
         x = 60,
@@ -214,7 +215,7 @@ local modules = {
     nbsPlayer = {path = "/etc/drc-modules/nbsPlayer.lua", cmd = [=[_G["nbsPlayer"] = module]=], link = "https://raw.githubusercontent.com/BrightYC/DRC/master/modules/NBS/player.lua"},
     nbsParser = {path = "/etc/drc-modules/nbsParser.lua", cmd = [=[_G["nbsParser"] = module]=], link = "https://raw.githubusercontent.com/BrightYC/DRC/master/modules/NBS/parser.lua"},
     nbsFreqtab = {path = "/etc/drc-modules/nbsFreqtab.lua", cmd = [=[_G["nbsFreqtab"] = module]=], link = "https://raw.githubusercontent.com/BrightYC/DRC/master/modules/NBS/freqtab.lua"},
-    nbsMain = {path = "/etc/drc-modules/nbsMain.lua", link = "https://raw.githubusercontent.com/BrightYC/DRC/master/modules/NBS/main.lua"}
+    nbsPlay = {path = "/etc/drc-modules/nbsPlay.lua", link = "https://raw.githubusercontent.com/BrightYC/DRC/master/modules/NBS/play.lua"}
 }
 
 local history = {}
@@ -340,7 +341,7 @@ local function battery(drone, redraw)
         foreground = color.lime
     end
 
-    if not (drone and stuff.droneOldBatteryCharge == batteryCharge or not drone and stuff.oldBatteryCharge == batteryCharge) and true then
+    if not (drone and stuff.droneOldBatteryCharge == batteryCharge or not drone and stuff.oldBatteryCharge == batteryCharge) and true or redraw then
         if redraw then
             set(x + 5, 1, "⠆", color.black, drone and color.blue or color.lime)
         end
@@ -398,7 +399,7 @@ local function drawDroneInfo(redraw)
                 set(3, y, language[stuff.language].droneInfo[str], color.gray, color.white)
             end
 
-            set(unicode.len(language[stuff.language].droneInfo[str]) + 5, y, droneData[str] and droneData[str] .. "          " or "N/A", color.gray, color.lime)
+            set(unicode.len(language[stuff.language].droneInfo[str]) + 5, y, droneData[str] and droneData[str] .. "          " or "N/A              ", color.gray, color.lime)
             y = y + 2
         end
     end
@@ -435,8 +436,13 @@ end
 
 local function chunkSend(...)
     local data = {...}
+    local copy = data
 
-    if #table.concat(data) >= 65535 then
+    for str = 1, #copy do
+        copy[str] = tostring(copy[str])
+    end
+
+    if #table.concat(copy) >= 65535 then
         if stuff.write then
             io.stderr:write("Maximum data of 64 KB =(\n")
         end
@@ -444,7 +450,7 @@ local function chunkSend(...)
         return false
     else
         if #table.concat(data) >= stuff.maxPacketSize then
-            local data = (">s2"):rep(#data):pack(table.unpack(data))
+            data = (">s2"):rep(#data):pack(table.unpack(data))
             local chunks = math.ceil(#data / stuff.maxPacketSize)
             local startLen, endLen, maxLen = 1, stuff.maxPacketSize, stuff.maxPacketSize
 
@@ -512,25 +518,33 @@ end
 
 local function sendModules()
     for module in pairs(modules) do 
-        if not chunkSend("module", modules[module].data, modules[module].cmd) then 
+        if not chunkSend("loadModule", module, modules[module].data, modules[module].cmd) then 
             exit()
             io.stderr:write("Module" .. module .. " contains more than 64 kb of data")
             os.exit()
         end
     end
 
-    send("module", false, "end")
+    send("loadModule", false, false, "end")
 end
 
 local function replPrint(stderr, data)
-    if not stuff.helpIsDrawed and stuff.write and not stuff.hide and stuff.interpretation then
+    if not stuff.hide then
         gpu.setBackground(color.gray)
+
         if stderr then
-            io.stderr:write(data .. "\n")
+            if stuff.write then
+                io.stderr:write("\n" .. data .. "\n")
+            else
+                io.stderr:write(data .. "\n")
+            end
         else
             gpu.setForeground(color.white)
             term.write(data .. "\n")
         end
+    elseif stuff.hide and stderr then
+        computer.beep(2000, .5)
+        stuff.lastError = data
     end
 end
 
@@ -602,7 +616,7 @@ local function updateData(response)
         send("data")
         connectionLostTimer = event.timer(3, connectionLost)
         stuff.requesting = true
-    elseif response then
+    elseif response[1] then
         if connectionLostTimer then
             event.cancel(connectionLostTimer)
         end
@@ -624,7 +638,7 @@ local function updateData(response)
             droneChangeColor()
         end
 
-        if not response[13] then 
+        if not response[13] then
             sendModules()
         end
     end
@@ -741,7 +755,7 @@ local commands = {
     [35] = function() if stuff.helpIsDrawed then stuff.helpIsDrawed = false term.setCursor(1, 1) drawGui() else stuff.helpIsDrawed = true term.setCursor(1, 1) drawHelp() end end,
     [13] = function() if stuff.strength + 5 ~= 105 then stuff.strength = stuff.strength + 5 end strength() signal(true) end,
     [12] = function() if stuff.strength - 5 ~= 0 then stuff.strength = stuff.strength - 5 end strength() signal(true) end,
-    [50] = function() if not stuff.hide then timers(false) stuff.hide = true gpu.setBackground(color.black) gpu.set(1, 1, " ") gpu.setResolution(1, 1) stuff.helpIsDrawed = false else timers(true) stuff.hide = false gpu.setResolution(80, 25) drawGui(true) end end,
+    [50] = function() if not stuff.hide then timers(false) stuff.hide = true gpu.setBackground(color.black) gpu.setResolution(1, 1) gpu.set(1, 1, " ") stuff.helpIsDrawed = false else timers(true) stuff.hide = false gpu.setResolution(80, 25) drawGui(true) if stuff.lastError then replPrint(true, stuff.lastError) stuff.lastError = false end end end,
     [16] = function() exit() end
 }
 
