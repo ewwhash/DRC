@@ -13,6 +13,7 @@ local tablet
 
 if not component.isAvailable("modem") then
     io.stderr:write("This program requires network card!")
+    os.exit()
 end
 if component.isAvailable("tablet") then
     tablet = component.tablet
@@ -531,15 +532,11 @@ end
 local function replPrint(stderr, data)
     if not stuff.hide then
         gpu.setBackground(color.gray)
+        gpu.setForeground(color.white)
 
         if stderr then
-            if stuff.write then
-                io.stderr:write("\n" .. data .. "\n")
-            else
-                io.stderr:write(data .. "\n")
-            end
+            io.stderr:write(data .. "\n")
         else
-            gpu.setForeground(color.white)
             term.write(data .. "\n")
         end
     elseif stuff.hide and stderr then
@@ -790,7 +787,7 @@ local function listenKey(evt, _, char, code)
         send("data")
     elseif code == 32 and keyboard.isControlDown() and (stuff.write and stuff.waitResponse) then
         send("interrupt")
-        event.pull(.2, "modem_message")
+        os.sleep(.1)
         stuff.interpretation = false
     end
 end
