@@ -76,11 +76,11 @@ local function pair(modemAddress, unpair)
     end
 end
  
-local function move(x, y, z)
+local function move(x, y, z, sleepTime)
     drone_.move(x, y, z)
  
     while drone_.getOffset() > .7 or drone_.getVelocity() > .7 do
-        sleep(.1, true_)
+        sleep(sleepTime or .1, true_)
     end
 end
  
@@ -190,7 +190,7 @@ local function runCode(code, traceback, moduleName)
  
         codeExecution = false_
     end
- 
+    sleep(.2)
     send("r-end")
 end
  
