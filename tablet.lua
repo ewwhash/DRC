@@ -5,8 +5,7 @@ local event = require("event")
 local fs = require("filesystem")
 local term = require("term")
 local keyboard = require("keyboard")
-local gpu = component.gpu
-local modem = component.modem
+local gpu, modem, internet = component.gpu
 local args = {...}
 local pairedCard, port = "", 0
 local tablet
@@ -14,6 +13,8 @@ local tablet
 if not component.isAvailable("modem") then
     io.stderr:write("This program requires network card!")
     os.exit()
+else
+    modem = component.modem
 end
 if component.isAvailable("tablet") then
     tablet = component.tablet
