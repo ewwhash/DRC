@@ -78,9 +78,10 @@ end
  
 local function move(x, y, z, sleepTime)
     drone_.move(x, y, z)
+    sleepTime = sleepTime or .1
  
     while drone_.getOffset() > .7 or drone_.getVelocity() > .7 do
-        sleep(sleepTime or .1, true_)
+        sleep(sleepTime, true_)
     end
 end
  
