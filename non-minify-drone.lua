@@ -190,7 +190,7 @@ local function runCode(code, traceback, moduleName)
  
         codeExecution = false_
     end
-    sleep(.2)
+
     send("r-end")
 end
  
