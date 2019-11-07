@@ -797,11 +797,11 @@ local function parseArgs()
         local data = file:read("a")
 
         if args[1] then
-            if not tonumber(args[1]) then
+            port = tonumber(args[1])
+
+            if not port then
                 io.write(help)
                 os.exit()
-            else
-                port = tonumber(args[1])
             end
         elseif data == "" then
             io.write(help)
