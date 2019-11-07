@@ -239,18 +239,6 @@ local function set(x, y, str, background, foreground)
     end
 end
 
-local function exit()
-    event.cancel(batteryTimer)
-    event.cancel(clockTimer)
-    event.cancel(dataTimer)
-    gpu.setBackground(color.black)
-    gpu.setForeground(color.white)
-    gpu.setResolution(80, 25)
-    term.setViewport(gpu.getViewport())
-    term.clear()
-    stuff.work = false
-end
-
 local function droneChangeColor()
     if not stuff.helpIsDrawed then
         gpu.setBackground(droneData.color)
@@ -523,7 +511,6 @@ local function sendModules()
         if not chunkSend("loadModule", module, modules[module].data, modules[module].cmd) then 
             exit()
             io.stderr:write("Module" .. module .. " contains more than 64 kb of data")
-            os.exit()
         end
     end
 
@@ -562,7 +549,7 @@ local function replWrite()
         repeat 
             gpu.setBackground(color.gray)
             gpu.setForeground(color.lime)
-            term.write("lua>")
+            io.write("lua>")
             gpu.setForeground(color.white)
             result = term.read(history)
 
@@ -827,9 +814,24 @@ local function parseArgs()
     end
 end
 
+function exit()
+    event.ignore("key_down", listenKey)
+    event.ignore("modem_message", listenMessage)
+    event.cancel(batteryTimer)
+    event.cancel(clockTimer)
+    event.cancel(dataTimer)
+    gpu.setBackground(color.black)
+    gpu.setForeground(color.white)
+    gpu.setResolution(80, 25)
+    term.setViewport(gpu.getViewport())
+    term.clear()
+    stuff.work, exit = false, nil
+    os.exit()
+end
+
 parseArgs()
 loadModules()
-require("process").info().data.signal = function() end
+require("process").info().data.signal = function() exit() end
 start()
 
 event.listen("key_down", listenKey)
@@ -838,7 +840,3 @@ event.listen("modem_message", listenMessage)
 while stuff.work do 
     os.sleep(0)
 end
-
-event.ignore("key_down", listenKey)
-event.ignore("modem_message", listenMessage)
-os.exit()
