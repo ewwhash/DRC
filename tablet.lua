@@ -4,6 +4,7 @@ local unicode = require("unicode")
 local event = require("event")
 local fs = require("filesystem")
 local term = require("term")
+local tty = require("tty")
 local keyboard = require("keyboard")
 local gpu, modem, internet = component.gpu
 local args = {...}
@@ -708,7 +709,9 @@ local function timers(enable)
 end
 
 local function start()
+    gpu.setResolution(80, 25)
     term.setViewport(80, 11, 0, 14, 1, 1)
+    tty.window.fullscreen = false
     drawGui(true)
     timers(true)
     send("data")
@@ -740,7 +743,7 @@ local commands = {
     [35] = function() if stuff.helpIsDrawed then stuff.helpIsDrawed = false term.setCursor(1, 1) drawGui() else stuff.helpIsDrawed = true term.setCursor(1, 1) drawHelp() end end,
     [13] = function() if stuff.strength + 5 ~= 105 then stuff.strength = stuff.strength + 5 end strength() signal(true) end,
     [12] = function() if stuff.strength - 5 ~= 0 then stuff.strength = stuff.strength - 5 end strength() signal(true) end,
-    [50] = function() if not stuff.hide then timers(false) stuff.hide = true gpu.setBackground(color.black) gpu.setResolution(1, 1) gpu.set(1, 1, " ") stuff.helpIsDrawed = false else timers(true) stuff.hide = false gpu.setResolution(80, 25) drawGui(true) if stuff.lastError then replPrint(true, stuff.lastError) stuff.lastError = false end end end,
+    [50] = function() if not stuff.hide then timers(false) stuff.hide = true gpu.setBackground(color.black) gpu.setResolution(1, 1) gpu.set(1, 1, " ") stuff.helpIsDrawed = false else timers(true) stuff.hide = false gpu.setResolution(80, 25) tty.window.fullscreen = false drawGui(true) if stuff.lastError then replPrint(true, stuff.lastError) stuff.lastError = false end end end,
     [16] = function() exit() end
 }
 
@@ -824,6 +827,7 @@ function exit()
     gpu.setForeground(color.white)
     gpu.setResolution(80, 25)
     term.setViewport(gpu.getViewport())
+    tty.window.fullscreen = false
     term.clear()
     stuff.work, exit = false, nil
     os.exit()
