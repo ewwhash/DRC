@@ -37,7 +37,16 @@ local function stderrPrint(stderr, ...)
 end
  
 local function sendData()
-    send("data", getAcceleration(), activeSide, activeSlot, drone_.count(), getColor(), computer_.energy() / (computer_.maxEnergy() / 100), allModulesReceived)
+    send("data",
+			getAcceleration(),
+			activeSide,
+			activeSlot,
+			drone_.count(),
+			getColor(),
+			computer_.energy() / (computer_.maxEnergy() / 100),
+			allModulesReceived,
+			(computer_.totalMemory() - computer_.freeMemory()) / (computer_.totalMemory() / 100)
+	)
 end
  
 local function readyState()

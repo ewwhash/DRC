@@ -171,7 +171,9 @@ local color = {
     orange = 0xf2b233,
     gray = 0x3c3c48,
     lightGray = 0xe5e5e5,
-    blue = 0x269fd8
+    blue = 0x269fd8,
+	green=0x29B06B,
+	brown=0x4A3429
 }
 
 local droneData = {
@@ -182,7 +184,8 @@ local droneData = {
     false, --items
 
     color = color.gray,
-    charge = 0
+    charge = 0,
+	memory = 0
 }
 
 local facings = {
@@ -330,6 +333,18 @@ end
 
 local function batteryBlock(x, block, empty, drone)
     set(x, 1, block, empty and color.black or drone and color.blue or color.lime, drone and color.blue or color.lime)
+end
+
+local function memory()
+	local x=45
+	set(x+1, 1, "⢸", color.green, color.green)
+	set(x+2, 1, "", color.green, color.green)
+	set(x+3, 1, "⣉", color.brown, color.green)
+	set(x+4, 1, "⢸", color.green, color.green)
+	set(x+5, 1, "⣉", color.brown, color.green)
+	set(x+6, 1, "⢸", color.green, color.green)
+	set(x+7, 1, "⢸", color.green, color.green)
+	set(x + 9, 1, math.floor(droneData.memory) .. "%", color.black, color.white)
 end
 
 local function battery(drone, redraw)
@@ -626,10 +641,12 @@ local function updateData(response)
         droneData[4] = math.ceil(response[5])
         droneData[5] = math.ceil(response[10])
         droneData.charge = response[12]
+        droneData.memory = response[12]
 
         drawDroneInfo()
         battery(true)
         signal()
+		memory()
 
         if response[11] ~= droneData.color then
             droneData.color = response[11]
