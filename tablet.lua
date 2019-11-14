@@ -172,8 +172,7 @@ local color = {
     gray = 0x3c3c48,
     lightGray = 0xe5e5e5,
     blue = 0x269fd8,
-	green=0x29B06B,
-	brown=0x4A3429
+	green=0x29B06B
 }
 
 local droneData = {
@@ -337,13 +336,13 @@ end
 
 local function memory()
 	local x=45
-	set(x+1, 1, "⢸", color.green, color.green)
-	set(x+2, 1, "", color.green, color.green)
-	set(x+3, 1, "⣉", color.brown, color.green)
-	set(x+4, 1, "⢸", color.green, color.green)
-	set(x+5, 1, "⣉", color.brown, color.green)
-	set(x+6, 1, "⢸", color.green, color.green)
-	set(x+7, 1, "⢸", color.green, color.green)
+	set(x+1, 1, "⢸", color.black, color.green)
+	set(x+2, 1, "⢸", color.black, color.green)
+	set(x+3, 1, "r", color.green, color.white)
+	set(x+4, 1, "a", color.green, color.white)
+	set(x+5, 1, "m", color.green, color.white)
+	set(x+6, 1, "⢸", color.green, color.black)
+	set(x+7, 1, "⢸", color.green, color.black)
 	set(x + 9, 1, math.floor(droneData.memory) .. "%", color.black, color.white)
 end
 
