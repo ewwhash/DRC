@@ -2,7 +2,7 @@ local component = require("component")
 local computer = require("computer")
 local unicode = require("unicode")
 local event = require("event")
-local fs = require("filesystem")
+local filesystem = require("filesystem")
 local term = require("term")
 local tty = require("tty")
 local keyboard = require("keyboard")
@@ -36,8 +36,8 @@ end
 
 local language = {
     RU = {
-        help = "Помощь —",
-        exit = "Выход —",
+        help = "[0xffffff]Помощь — [0x7fcc19]H",
+        exit = "[0xffffff]Выход — [0x7fcc19]Q",
 
         side = {
             [0] = "Низ",
@@ -49,33 +49,33 @@ local language = {
         },
 
         droneInfo = {
-            "Ускорение:",
-            "Активная сторона:",
-            "Активный слот:",
-            "Расстояние до дрона:",
-            "Кол-во вещей в активном слоте:"
+            acceleration = "[0xffffff]Ускорение: [0x7fcc19]",
+            activeSide = "[0xffffff]Активная сторона: [0x7fcc19]",
+            activeSlot = "[0xffffff]Активный слот: [0x7fcc19]",
+            distance = "[0xffffff]Расстояние до дрона: [0x7fcc19]",
+            items = "[0xffffff]Кол-во вещей в активном слоте: [0x7fcc19]"
         },
 
         fullHelp = {
-            "Перемещение — WASD",
-            "Вверх/Вниз — LSHIFT/LCTRL",
-            "Сломать/Установить блок — Z/X",
-            "Забрать/Выбросить вещи из активной стороны — R/F",
-            "Захватить/Отцепить ближайших существ — С/V",
-            "Открыть/Закрыть интерпретатор — I/CTRL+D",
-            "Включить/Выключить дрона — P",
-            "Увеличить/Уменьшить силу сигнала — +/-",
-            "Смена ускорения — B",
-            "Активный слот — 1-8",
-            "Активная сторона — ALT+0-5",
-            "Установить цвет дрона на случайный — L",
-            "Принудительно обновить данные — E",
-            "Вернуть дрона домой — G",
-            "Перезагрука дрона — O",
-            "Перемещение по координатам — N",
-            "Односимвольный экран — M",
-            "Отвязать дрона — CTRL+ALT+U",
-            exit = "Чтобы закрыть нажмите"
+            "[0x7fcc19]CTRL+ALT+U [0xffffff]— Отвязать дрона",
+            "[0x7fcc19]LSHIFT/LCTRL [0xffffff]— Вверх/Вниз",
+            "[0x7fcc19]I/CTRL+D [0xffffff]— Открыть/Закрыть интерпретатор",
+            "[0x7fcc19]ALT+0-5 [0xffffff]— Активная сторона",
+            "[0x7fcc19]WASD [0xffffff]— Перемещение",
+            "[0x7fcc19]1-8 [0xffffff]— Активный слот",
+            "[0x7fcc19]Z/X [0xffffff]— Сломать/Установить блок",
+            "[0x7fcc19]R/F [0xffffff]— Забрать/Выбросить вещи из активной стороны",
+            "[0x7fcc19]С/V [0xffffff]— Захватить/Отцепить ближайших существ",
+            "[0x7fcc19]+/- [0xffffff]— Увеличить/Уменьшить силу сигнала",
+            "[0x7fcc19]P [0xffffff]— Включить/Выключить дрона",
+            "[0x7fcc19]B [0xffffff]— Смена ускорения",
+            "[0x7fcc19]L [0xffffff]— Установить цвет дрона на случайный",
+            "[0x7fcc19]E [0xffffff]— Принудительно обновить данные",
+            "[0x7fcc19]G [0xffffff]— Вернуть дрона домой",
+            "[0x7fcc19]O [0xffffff]— Перезагрука дрона",
+            "[0x7fcc19]N [0xffffff]— Перемещение по координата",
+            "[0x7fcc19]M [0xffffff]— Односимвольный экран",
+            exit = "[0xffffff]Чтобы закрыть нажмите [0x7fcc19]H [0xffffff]..."
         },
 
         coordsMove = {
@@ -90,8 +90,8 @@ local language = {
     },
 
     EN = {
-        help = "Help —",
-        exit = "Exit —",
+        help = "[0xffffff]Help — [0x7fcc19]H",
+        exit = "[0xffffff]Exit — [0x7fcc19]Q",
 
         side = {
             [0] = "Down",
@@ -103,33 +103,33 @@ local language = {
         },
 
         droneInfo = {
-            "Acceleration:",
-            "Active side:",
-            "Active slot:",
-            "Distance to drone:",
-            "Items in active slot:"
+            acceleration = "[0xffffff]Acceleration: [0x7fcc19]",
+            activeSide = "[0xffffff]Active side: [0x7fcc19]",
+            activeSlot = "[0xffffff]Active slot: [0x7fcc19]",
+            distance = "[0xffffff]Distance to drone: [0x7fcc19]",
+            items = "[0xffffff]Items in active slot: [0x7fcc19]"
         },
 
         fullHelp = {
-            "Move — WASD",
-            "Up/Down — LSHIFT/LCTRL",
-            "Break/Place block — Z/X",
-            "Take/Drop — R/F",
-            "Leash/Unleash — С/V",
-            "Open/Close interpreter — I/CTRL+D",
-            "Enable/Disable drone — P",
-            "Increase/Reduce modem strength — +/-",
-            "Change acceleration — B",
-            "Active slot — 1-8",
-            "Active side — ALT+0-5",
-            "Random color — L",
-            "Force update — E",
-            "Back to home — G",
-            "Reboot drone — O",
-            "Move by coords — N",
-            "One pixel screen — M",
-            "Unpair — CTRL+ALT+U",
-            exit = "To close press"
+            "[0x7fcc19]CTRL+ALT+U [0xffffff]— Unpair",
+            "[0x7fcc19]LSHIFT/LCTRL [0xffffff]— Up/Down",
+            "[0x7fcc19]I/CTRL+D [0xffffff]— Open/Close interpreter",
+            "[0x7fcc19]ALT+0-5 [0xffffff]— Active side",
+            "[0x7fcc19]WASD [0xffffff]— Move",
+            "[0x7fcc19]1-8 [0xffffff]— Active slot",
+            "[0x7fcc19]Z/X [0xffffff]— Break/Place block",
+            "[0x7fcc19]R/F [0xffffff]— Take/Drop",
+            "[0x7fcc19]C/V [0xffffff]— Leash/Unleash",
+            "[0x7fcc19]+/- [0xffffff]— Increase/Reduce modem strength",
+            "[0x7fcc19]P [0xffffff]— Enable/Disable drone",
+            "[0x7fcc19]B [0xffffff]— Change acceleration",
+            "[0x7fcc19]L [0xffffff]— Random color",
+            "[0x7fcc19]E [0xffffff]— Force update",
+            "[0x7fcc19]G [0xffffff]— Back to home",
+            "[0x7fcc19]O [0xffffff]— Reboot drone",
+            "[0x7fcc19]N [0xffffff]— Move by coords",
+            "[0x7fcc19]M [0xffffff]— One pixel screen",
+            exit = "[0xffffff]To close press [0x7fcc19]H [0xffffff]..."
         },
 
         coordsMove = {
@@ -166,24 +166,28 @@ local stuff = {
 }
 
 local color = {
+    pattern = "%[0x(%x%x%x%x%x%x)]",
+
     white = 0xffffff,
     black  = 0x000000,
     lime = 0x7fcc19,
     orange = 0xf2b233,
     gray = 0x3c3c48,
     lightGray = 0xe5e5e5,
-    blue = 0x269fd8
+    blue = 0x269fd8,
+    red = 0xff5555,
 }
 
 local droneData = {
-    false, --acceleration
-    false, --activeSide
-    false, --activeSlot
-    false, --distance
-    false, --items
+    acceleration = false,
+    activeSide = false,
+    activeSlot = false,
+    distance = false,
+    items = false,
 
     color = color.gray,
-    charge = 0
+    charge = 0,
+    ram = 0
 }
 
 local facings = {
@@ -240,6 +244,27 @@ local function set(x, y, str, background, foreground)
     end
 end
 
+local function setColorText(x, y, str, background)
+    local begin = 1
+
+    while true do
+        local b, e, color = str:find(color.pattern, begin)
+        local precedingString = str:sub(begin, b and (b - 1))
+
+        if precedingString then
+            set(x, y, precedingString, background)
+            x = x + unicode.len(precedingString)
+        end
+
+        if not color then
+            break
+        end
+
+        gpu.setForeground(tonumber(color, 16))
+        begin = e + 1
+    end
+end
+
 local function droneChangeColor()
     if not stuff.helpIsDrawed then
         gpu.setBackground(droneData.color)
@@ -282,35 +307,20 @@ local function droneDraw()
     end
 end
 
-local function clock()
-    local f = io.open("/tmp/time", "w")
-    f:write("time")
-    f:close()
-    local timestamp = fs.lastModified("/tmp/time") / 1000 + 3600 * stuff.timezone
-    set(33, 1, os.date("%H:%M", timestamp), color.black, color.white)
-end
-
-local function signalBlock(x, block, signal)
-    set(x, 1, block, color.black, signal and color.lime or color.orange)
-end
-
 local function signal(strength)
     if not strength then
-        if droneData[4] then
-            if droneData[4] <= modem.getStrength() / 100 * 25 then
-                signalBlock(72, "⣀⣤⣶⣿", true)
-            elseif droneData[4] <= modem.getStrength() / 100 * 50 then
-                signalBlock(72, "⣀⣤⣶", true)
-                signalBlock(75, "⣿")
-            elseif droneData[4] <= modem.getStrength() / 100 * 75 then
-                signalBlock(72, "⣀⣤", true)
-                signalBlock(74, "⣶⣿")
-            elseif droneData[4] <= modem.getStrength() then
-                signalBlock(72, "⣀", true)
-                signalBlock(73, "⣤⣶⣿")
+        if droneData.distance then
+            if droneData.distance <= modem.getStrength() / 100 * 25 then
+                setColorText(72, 1, "[0x7fcc19]⣀⣤⣶⣿", color.black)
+            elseif droneData.distance <= modem.getStrength() / 100 * 50 then
+                setColorText(72, 1, "[0x7fcc19]⣀⣤⣶[0xf2b233]⣿", color.black)
+            elseif droneData.distance <= modem.getStrength() / 100 * 75 then
+                setColorText(72, 1, "[0x7fcc19]⣀⣤[0xf2b233]⣶⣿", color.black)
+            elseif droneData.distance <= modem.getStrength() then
+                setColorText(72, 1, "[0x7fcc19]⣀[0xf2b233]⣤⣶⣿", color.black)
             end
         else
-            signalBlock(72, "⣀⣤⣶⣿")
+            setColorText(72, 1, "[0xf2b233]⣀⣤⣶⣿", color.black)
         end
     else
         set(77, 1, stuff.strength .. "%  ", color.black, color.white)
@@ -364,45 +374,57 @@ local function battery(drone, redraw)
     end
 end
 
+local function ram(redraw)
+    gpu.setBackground(color.black)
+    gpu.fill(47, 1, 4, 1, " ")
+    if redraw then
+        set(42, 1, "RAM: ", color.black, color.white)
+    end
+    set(47, 1, droneData.ram .. "%", color.black, color.white)
+
+    if droneData.ram >= 95 then
+        setColorText(52, 1, "[0xff5555]⠒⠒⠒⠒⠒⠒", color.black)
+    elseif droneData.ram >= 80 then
+        setColorText(52, 1, "[0xff5555]⠒⠒⠒⠒⠒[0x3c3c48]⠒", color.black)
+    elseif droneData.ram >= 60 then
+        setColorText(52, 1, "[0xf2b233]⠒⠒⠒⠒[0x3c3c48]⠒⠒", color.black)
+    elseif droneData.ram >= 40 then 
+        setColorText(52, 1, "[0xf2b233]⠒⠒⠒[0x3c3c48]⠒⠒⠒", color.black)
+    elseif droneData.ram >= 20 then
+        setColorText(52, 1, "[0x7fcc19]⠒⠒[0x3c3c48]⠒⠒⠒⠒", color.black)
+    else
+        setColorText(52, 1, "[0x7fcc19]⠒[0x3c3c48]⠒⠒⠒⠒⠒", color.black)
+    end
+end
+
 local function drawHelp()
     if not stuff.hide then
         gpu.setBackground(color.gray)
         gpu.fill(1, 2, 80, 24, " ")
-        local y = 2
 
-        for str = 1, #language[stuff.language].fullHelp do
-            local strMatch = language[stuff.language].fullHelp[str]:match(".+—")
-            set(1, y + str, strMatch, color.gray, color.white)
-            set(unicode.len(strMatch) + 1, y + str, language[stuff.language].fullHelp[str]:match("—(.+)"), color.gray, color.lime)
+        for str = 1, #language[stuff.language].fullHelp do 
+            setColorText(1, str + 2, language[stuff.language].fullHelp[str])
         end
 
-        set(1, #language[stuff.language].fullHelp + 4, language[stuff.language].fullHelp.exit .. "   ...", color.gray, color.white)
-        set(unicode.len(language[stuff.language].fullHelp.exit) + 2, #language[stuff.language].fullHelp + 4, "H", color.gray, color.lime)
+        setColorText(1, #language[stuff.language].fullHelp + 4, language[stuff.language].fullHelp.exit)
     end
 end
 
 local function drawDroneInfo(redraw)
     if not stuff.helpIsDrawed then
-        local y = 3
-
-        for str = 1, #language[stuff.language].droneInfo do
-            if redraw then
-                set(3, y, language[stuff.language].droneInfo[str], color.gray, color.white)
-            end
-
-            set(unicode.len(language[stuff.language].droneInfo[str]) + 5, y, droneData[str] and droneData[str] .. "          " or "N/A              ", color.gray, color.lime)
-            y = y + 2
-        end
+        setColorText(3, 3, language[stuff.language].droneInfo.acceleration .. " " .. (droneData.acceleration and droneData.acceleration .. "          " or "N/A              "), color.gray)
+        setColorText(3, 5, language[stuff.language].droneInfo.activeSide .. " " .. (droneData.activeSide and droneData.activeSide .. "          " or "N/A              "), color.gray)
+        setColorText(3, 7, language[stuff.language].droneInfo.activeSlot .. " " .. (droneData.activeSlot and droneData.activeSlot .. "          " or "N/A              "), color.gray)
+        setColorText(3, 9, language[stuff.language].droneInfo.distance .. " " .. (droneData.distance and droneData.distance .. "          " or "N/A              "), color.gray)
+        setColorText(3, 11, language[stuff.language].droneInfo.items .. " " .. (droneData.items and droneData.items .. "          " or "N/A              "), color.gray)
     end
 end
 
 local function drawGui(redraw)
     gpu.setBackground(color.gray)
     gpu.fill(1, 2, 80, 24, " ")
-    set(1, 13, language[stuff.language].help, color.gray, color.white)
-    set(80 - unicode.len(language[stuff.language].exit) - 1, 13, language[stuff.language].exit, color.gray, color.white)
-    set(unicode.len(language[stuff.language].help) + 2, 13, "H", color.gray, color.lime)
-    set(80, 13, "Q", color.gray, color.lime)
+    setColorText(1, 13, language[stuff.language].help)
+    setColorText(81 - unicode.len(language[stuff.language].exit:gsub(color.pattern, "")), 13, language[stuff.language].exit)
 
     gpu.setForeground(color.lightGray)
     gpu.fill(1, 14, 80, 1, "⠉")
@@ -413,11 +435,11 @@ local function drawGui(redraw)
     if redraw then
         gpu.setBackground(color.black)
         gpu.fill(1, 1, 80, 1, " ")
+        ram(true)
         battery(false, true)
         battery(true, true)
         signal()
         signal(true)
-        clock()
     end
 end
 
@@ -460,10 +482,10 @@ local function chunkSend(...)
 end
 
 local function downloadModules()
-    fs.makeDirectory("/etc/drc-modules")
+    filesystem.makeDirectory("/etc/drc-modules")
 
     for module in pairs(modules) do 
-        if not fs.exists("/etc/drc-modules/" .. module .. ".lua") and modules[module].link then
+        if not filesystem.exists("/etc/drc-modules/" .. module .. ".lua") and modules[module].link then
             if internet then
                 io.write("Download module: " .. module .. "...\n")
                 local handle, data, chunk = internet.request(modules[module].link), ""
@@ -512,10 +534,9 @@ local function sendModules()
         if not chunkSend("loadModule", module, modules[module].data, modules[module].cmd) then 
             exit()
             io.stderr:write("Module" .. module .. " contains more than 64 kb of data")
+            os.exit()
         end
     end
-
-    send("loadModule", false, false, "end")
 end
 
 local function replPrint(stderr, data)
@@ -526,7 +547,7 @@ local function replPrint(stderr, data)
         if stderr then
             io.stderr:write(data .. "\n")
         else
-            term.write(data .. "\n")
+            io.write(data .. "\n")
         end
     elseif stuff.hide and stderr then
         computer.beep(2000, .5)
@@ -579,53 +600,55 @@ end
 
 local function connectionLost()
     if stuff.work then
+        stuff.requesting = false
         computer.beep(1500, .1)
 
-        for data = 1, #droneData do 
-            droneData[data] = false
-        end
+        droneData.acceleration = false
+        droneData.activeSide = false
+        droneData.activeSlot = false
+        droneData.distance = false
+        droneData.items = false
 
         droneData.color = color.gray
         droneData.charge = 0
+        droneData.ram = 0
 
         droneChangeColor()
         drawDroneInfo()
+        ram()
         battery(true)
         signal()
-
-        stuff.requesting = false
     end
 end
 
 local function updateData(response)
     if not response and not stuff.requesting then
         send("data")
-        connectionLostTimer = event.timer(3, connectionLost)
+        connectionLostTimer = event.timer(5, connectionLost)
         stuff.requesting = true
-    elseif response[1] then
+    elseif response then
         if connectionLostTimer then
             event.cancel(connectionLostTimer)
         end
 
         stuff.requesting = false
-        droneData[1] = response[7]
-        droneData[2] = math.ceil(response[8]) .. " (" .. language[stuff.language].side[response[8]] .. ")"
-        droneData[3] = math.ceil(response[9])
-        droneData[4] = math.ceil(response[5])
-        droneData[5] = math.ceil(response[10])
+        droneData.acceleration = response[7]
+        droneData.activeSide = math.ceil(response[8]) .. " (" .. language[stuff.language].side[response[8]] .. ")"
+        droneData.activeSlot = math.ceil(response[9])
+        droneData.distance = math.ceil(response[5])
+        droneData.items = math.ceil(response[10])
+
         droneData.charge = response[12]
+        droneData.ram = math.ceil(response[13])
 
         drawDroneInfo()
+        ram()
         battery(true)
         signal()
 
         if response[11] ~= droneData.color then
             droneData.color = response[11]
             droneChangeColor()
-        end
-
-        if not response[13] then
-            sendModules()
         end
     end
 end
@@ -699,11 +722,9 @@ end
 local function timers(enable)
     if enable then
         batteryTimer = event.timer(5, battery, math.huge) 
-        clockTimer = event.timer(60, clock, math.huge) 
         dataTimer = event.timer(20, updateData, math.huge)
     else
         event.cancel(batteryTimer) 
-        event.cancel(clockTimer) 
         event.cancel(dataTimer)
     end
 end
@@ -739,12 +760,12 @@ local commands = {
 
     [18] = function() updateData() end,
     [23] = function() replWrite() end,
-    [22] = function() if keyboard.isControlDown() and keyboard.isAltDown() then send("unpair") local file = io.open("/etc/drc.cfg", "w") file:write() file:close() exit() end end,
+    [22] = function() if keyboard.isControlDown() and keyboard.isAltDown() then send("unpair") local file = io.open("/etc/drc.cfg", "w") file:write() file:close() exit(true) end end,
     [35] = function() if stuff.helpIsDrawed then stuff.helpIsDrawed = false term.setCursor(1, 1) drawGui() else stuff.helpIsDrawed = true term.setCursor(1, 1) drawHelp() end end,
     [13] = function() if stuff.strength + 5 ~= 105 then stuff.strength = stuff.strength + 5 end strength() signal(true) end,
     [12] = function() if stuff.strength - 5 ~= 0 then stuff.strength = stuff.strength - 5 end strength() signal(true) end,
     [50] = function() if not stuff.hide then timers(false) stuff.hide = true gpu.setBackground(color.black) gpu.setResolution(1, 1) gpu.set(1, 1, " ") stuff.helpIsDrawed = false else timers(true) stuff.hide = false gpu.setResolution(80, 25) tty.window.fullscreen = false drawGui(true) if stuff.lastError then replPrint(true, stuff.lastError) stuff.lastError = false end end end,
-    [16] = function() exit() end
+    [16] = function() if not stuff.write then exit() end end
 }
 
 local function listenMessage(...)
@@ -753,6 +774,8 @@ local function listenMessage(...)
     if data[3] == pairedCard and data[4] == port then
         if data[6] == "data" then
             updateData(data)
+        elseif data[6] == "getModules" then
+            sendModules()
         elseif data[6] == "ping" then
             send("pong")
         elseif data[6] == "print" then
@@ -763,7 +786,7 @@ local function listenMessage(...)
     end
 end
 
-local function listenKey(evt, _, char, code)
+local function listenKey(_, _, char, code)
     if not stuff.write and commands[code] then
         commands[code]()
     elseif code >= 2 and code <= 11 and not stuff.write then
@@ -778,7 +801,7 @@ local function listenKey(evt, _, char, code)
         send("data")
     elseif code == 32 and keyboard.isControlDown() and (stuff.write and stuff.waitResponse) then
         send("interrupt")
-        os.sleep(.1)
+        os.sleep(.2)
         stuff.interpretation = false
     end
 end
@@ -817,11 +840,10 @@ local function parseArgs()
     end
 end
 
-function exit()
+function exit(forcibly)
     event.ignore("key_down", listenKey)
     event.ignore("modem_message", listenMessage)
     event.cancel(batteryTimer)
-    event.cancel(clockTimer)
     event.cancel(dataTimer)
     gpu.setBackground(color.black)
     gpu.setForeground(color.white)
@@ -830,12 +852,15 @@ function exit()
     tty.window.fullscreen = false
     term.clear()
     stuff.work, exit = false, nil
-    os.exit()
+
+    if forcibly then
+        os.exit()
+    end
 end
 
 parseArgs()
 loadModules()
-require("process").info().data.signal = function() exit() end
+require("process").info().data.signal = function() exit(true) end
 start()
 
 event.listen("key_down", listenKey)
