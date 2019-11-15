@@ -37,7 +37,12 @@ local function stderrPrint(stderr, ...)
 end
  
 local function sendData()
-    send("data", getAcceleration(), activeSide, activeSlot, drone_.count(), getColor(), computer_.energy() / (computer_.maxEnergy() / 100), allModulesReceived)
+    send("data", getAcceleration(), activeSide, activeSlot, drone_.count(), getColor(), computer_.energy() / (computer_.maxEnergy() / 100), (computer_.totalMemory() - computer_.freeMemory()) / (computer_.totalMemory() / 100))
+
+    if not allModulesReceived then
+        send("getModules")
+        allModulesReceived = true_
+    end
 end
  
 local function readyState()
@@ -59,7 +64,7 @@ local function pair(modemAddress, unpair)
             readyState()
         else        
             local data = eeprom_.getData()
-            local portCheck = tonumber(data:match(",(%d+)"))
+            local portCheck = tonumber_(data:match(",(%d+)"))
 
             if portCheck then 
                 pairedCard, port = data:match("([%w%p+]+),"), portCheck
@@ -74,8 +79,8 @@ local function pair(modemAddress, unpair)
             end
         end
     end
-end
- 
+end 
+
 local function blockMove(x, y, z, sleepTime)
     drone_.move(x, y, z)
     sleepTime = sleepTime or .1
@@ -179,7 +184,7 @@ local function runCode(code, traceback, moduleName)
  
                 if not error_ then
                     if returnData[2]:match("stack") then
-                        error_ = "task failed succefully!"
+                        error_ = "error?"
                     else
                         error_ = returnData[2]
                     end
@@ -196,14 +201,8 @@ local function runCode(code, traceback, moduleName)
 end
  
 local function loadModule(name, code, command)
-    if not allModulesReceived then
-        if command == "end" then
-            allModulesReceived = true_
-        else
-            module = code
-            runCode(command or code, false_, name)
-        end
-    end
+    module = code
+    runCode(command or code, false_, name)
 end
  
 function pull(timeout)
@@ -220,7 +219,7 @@ function pull(timeout)
  
                 while pos < #data do
                     arg, pos = string.unpack(">s2", data, pos)
-                    table.insert(args, arg)
+                    table_.insert(args, arg)
                 end
  
                 if cmd[args[1]] and not ignore then
@@ -256,7 +255,7 @@ function sleep(timeout)
 end
  
 cmd = {
-    blockMove = drone_.move,
+    move = drone_.move,
     swing = function() drone_.swing(activeSide) end,
     place = function() drone_.place(activeSide) end,
     suck = function() if inventorySize() > 1 then for i = 1, inventorySize() do selectSlot(i) drone_.suck(activeSide) end selectSlot(activeSlot) end end,
@@ -274,7 +273,7 @@ cmd = {
     loadModule = loadModule
 }
 
-print, move, distance, moveToUser, slot = function(...) stderrPrint(false_, ...) end, blockMove, getDistanceToUser, goToUser, safeSelectSlot
+print, move, update, distance, moveToUser, slot = function(...) stderrPrint(false_, ...) end, blockMove, sendData, getDistanceToUser, goToUser, safeSelectSlot
  
 modem_.setWakeMessage("shutboot")
 safeSelectSlot(1)
