@@ -4,6 +4,7 @@ local unicode = require("unicode")
 local event = require("event")
 local fs = require("filesystem")
 local term = require("term")
+local tty = require("tty")
 local keyboard = require("keyboard")
 local gpu, modem, internet = component.gpu
 local args = {...}
@@ -239,18 +240,6 @@ local function set(x, y, str, background, foreground)
         gpu.setBackground(color.gray)
         gpu.setForeground(color.white)
     end
-end
-
-local function exit()
-    event.cancel(batteryTimer)
-    event.cancel(clockTimer)
-    event.cancel(dataTimer)
-    gpu.setBackground(color.black)
-    gpu.setForeground(color.white)
-    gpu.setResolution(80, 25)
-    term.setViewport(gpu.getViewport())
-    term.clear()
-    stuff.work = false
 end
 
 local function droneChangeColor()
@@ -537,7 +526,6 @@ local function sendModules()
         if not chunkSend("loadModule", module, modules[module].data, modules[module].cmd) then 
             exit()
             io.stderr:write("Module" .. module .. " contains more than 64 kb of data")
-            os.exit()
         end
     end
 
@@ -576,7 +564,7 @@ local function replWrite()
         repeat 
             gpu.setBackground(color.gray)
             gpu.setForeground(color.lime)
-            term.write("lua>")
+            io.write("lua>")
             gpu.setForeground(color.white)
             result = term.read(history)
 
@@ -737,7 +725,9 @@ local function timers(enable)
 end
 
 local function start()
+    gpu.setResolution(80, 25)
     term.setViewport(80, 11, 0, 14, 1, 1)
+    tty.window.fullscreen = false
     drawGui(true)
     timers(true)
     send("data")
@@ -769,7 +759,7 @@ local commands = {
     [35] = function() if stuff.helpIsDrawed then stuff.helpIsDrawed = false term.setCursor(1, 1) drawGui() else stuff.helpIsDrawed = true term.setCursor(1, 1) drawHelp() end end,
     [13] = function() if stuff.strength + 5 ~= 105 then stuff.strength = stuff.strength + 5 end strength() signal(true) end,
     [12] = function() if stuff.strength - 5 ~= 0 then stuff.strength = stuff.strength - 5 end strength() signal(true) end,
-    [50] = function() if not stuff.hide then timers(false) stuff.hide = true gpu.setBackground(color.black) gpu.setResolution(1, 1) gpu.set(1, 1, " ") stuff.helpIsDrawed = false else timers(true) stuff.hide = false gpu.setResolution(80, 25) drawGui(true) if stuff.lastError then replPrint(true, stuff.lastError) stuff.lastError = false end end end,
+    [50] = function() if not stuff.hide then timers(false) stuff.hide = true gpu.setBackground(color.black) gpu.setResolution(1, 1) gpu.set(1, 1, " ") stuff.helpIsDrawed = false else timers(true) stuff.hide = false gpu.setResolution(80, 25) tty.window.fullscreen = false drawGui(true) if stuff.lastError then replPrint(true, stuff.lastError) stuff.lastError = false end end end,
     [16] = function() exit() end
 }
 
@@ -826,11 +816,11 @@ local function parseArgs()
         local data = file:read("a")
 
         if args[1] then
-            if not tonumber(args[1]) then
+            port = tonumber(args[1])
+
+            if not port then
                 io.write(help)
                 os.exit()
-            else
-                port = tonumber(args[1])
             end
         elseif data == "" then
             io.write(help)
@@ -843,9 +833,25 @@ local function parseArgs()
     end
 end
 
+function exit()
+    event.ignore("key_down", listenKey)
+    event.ignore("modem_message", listenMessage)
+    event.cancel(batteryTimer)
+    event.cancel(clockTimer)
+    event.cancel(dataTimer)
+    gpu.setBackground(color.black)
+    gpu.setForeground(color.white)
+    gpu.setResolution(80, 25)
+    term.setViewport(gpu.getViewport())
+    tty.window.fullscreen = false
+    term.clear()
+    stuff.work, exit = false, nil
+    os.exit()
+end
+
 parseArgs()
 loadModules()
-require("process").info().data.signal = function() end
+require("process").info().data.signal = function() exit() end
 start()
 
 event.listen("key_down", listenKey)
@@ -854,7 +860,3 @@ event.listen("modem_message", listenMessage)
 while stuff.work do 
     os.sleep(0)
 end
-
-event.ignore("key_down", listenKey)
-event.ignore("modem_message", listenMessage)
-os.exit()

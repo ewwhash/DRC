@@ -85,7 +85,7 @@ local function pair(modemAddress, unpair)
     end
 end
  
-local function move(x, y, z, sleepTime)
+local function blockMove(x, y, z, sleepTime)
     drone_.move(x, y, z)
     sleepTime = sleepTime or .1
  
@@ -113,16 +113,16 @@ local function goToUser()
             ignore = true_
             local r = getDistanceToUser()
  
-            move(1, 0, 0)
+            blockMove(1, 0, 0)
             local r1 = getDistanceToUser()
  
-            move(-1, 1, 0)
+            blockMove(-1, 1, 0)
             local r2 = getDistanceToUser()
  
-            move(0, -1, 1)
+            blockMove(0, -1, 1)
             local r3 = getDistanceToUser()
  
-            move(0, 0, -1)
+            blockMove(0, 0, -1)
  
             local x = (r*r - r1*r1 +1) / 2
             local y = (r*r - r2*r2 +1) / 2
@@ -130,7 +130,7 @@ local function goToUser()
  
             if math_.ceil(r) == math_.ceil(getDistanceToUser()) then
                 ignore = false_
-                move(x, y, z)
+                blockMove(x, y, z)
             end
         until getDistanceToUser() <= 5
 
@@ -265,7 +265,7 @@ function sleep(timeout)
 end
  
 cmd = {
-    move = drone_.move,
+    blockMove = drone_.move,
     swing = function() drone_.swing(activeSide) end,
     place = function() drone_.place(activeSide) end,
     suck = function() if inventorySize() > 1 then for i = 1, inventorySize() do selectSlot(i) drone_.suck(activeSide) end selectSlot(activeSlot) end end,
@@ -279,11 +279,11 @@ cmd = {
     light = function(color) setColor(color) sendData() end,
     runCode = runCode,
     goToMe = goToUser,
-    goToCoords = function(x, y, z) move(0, y, 0) move(x, 0, z) move(0, -y, 0) end,
+    goToCoords = function(x, y, z) blockMove(0, y, 0) blockMove(x, 0, z) blockMove(0, -y, 0) end,
     loadModule = loadModule
 }
 
-print, move, distance, goToUser, slot = function(...) stderrPrint(false_, ...) end, move, getDistanceToUser, goToUser, safeSelectSlot
+print, move, distance, moveToUser, slot = function(...) stderrPrint(false_, ...) end, blockMove, getDistanceToUser, goToUser, safeSelectSlot
  
 modem_.setWakeMessage("shutboot")
 safeSelectSlot(1)
