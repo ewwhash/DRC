@@ -628,7 +628,7 @@ local function updateData(response)
         send("data")
         connectionLostTimer = event.timer(5, connectionLost)
         stuff.requesting = true
-    elseif response then
+    elseif response and type(response) == "table" and response[1] then
         if connectionLostTimer then
             event.cancel(connectionLostTimer)
         end
