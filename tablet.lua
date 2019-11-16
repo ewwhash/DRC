@@ -225,8 +225,6 @@ local modules = {
     nbsPlay = {path = "/etc/drc-modules/nbsPlay.lua", link = "https://raw.githubusercontent.com/BrightYC/DRC/master/modules/NBS/play.lua"}
 }
 
-local history = {}
-
 local function set(x, y, str, background, foreground)
     if background and gpu.getBackground() ~= background then
         gpu.setBackground(background)
@@ -564,6 +562,58 @@ local function waitResponse()
     until not stuff.interpretation
     stuff.waitResponse = false
 end
+
+map = function(t,f)
+	local out={}
+	for k, v in pairs(t) do
+		local k1,v1=f(k,v)
+		out[k1]=v1
+	end
+	return out
+end
+
+filterList = function(t, filterIter)
+  local out = {}
+
+  for k, v in pairs(t) do
+    if filterIter(v, k, t) then table.insert(out,v) end
+  end
+
+  return out
+end
+
+local hintCache={}
+ 
+local function keysOfTable(context)
+    local r=hintCache[context]
+    if not r then
+        send("tab",context)
+        local response = {event.pull(5, "modem_message")}
+        if response[6]=="tab-results" then
+            r={}
+            for i in response[7]:gmatch("[A-z][A-z0-9]*") do
+                table.insert(r,i)
+            end
+            hintCache[context]=r
+        end
+    end
+    return r
+end
+ 
+local history = {
+    hint = function(line, index)
+        line = line or ""
+        local tail = line:sub(index)
+        line = line:sub(1, index - 1)
+		local lastIndexOfDot=line:reverse():find("%.") or -1
+		
+        local context=line:sub(1,-lastIndexOfDot-1)
+        local fragment = (lastIndexOfDot == -1) and line or line:sub(#line-lastIndexOfDot+2)
+		
+		context = (context=="") and "_G" or context
+		return map(filterList(keysOfTable(context),function(v) return v:find(fragment)==1 end),function(k,v)return k, ((context=="_G") and "" or context..".")..v..tail end)
+    end
+}
 
 local function replWrite()
     if not stuff.helpIsDrawed and not stuff.hide then 

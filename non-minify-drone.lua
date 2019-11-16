@@ -204,6 +204,12 @@ local function loadModule(name, code, command)
     module = code
     runCode(command or code, false_, name)
 end
+
+local function keys(t)
+	local r={}
+	for k in pairs(t) do table.insert(r,k) end
+	return r
+end
  
 function pull(timeout)
     local deadline = uptime() + checkNumber(timeout, math_.huge)
@@ -237,6 +243,11 @@ function pull(timeout)
                 modem_.setStrength(maxModemStrength / 100 * signal[7])
             elseif signal[6] == "interrupt" and codeExecution then
                 error("interrupted")
+            elseif signal[6] == "tab" then
+				local func=load("return "..signal[7])
+                local context = func and func() or {}
+                context = (type(context)=="table") and context or {}
+                send("tab-results",table.concat(keys(context), ","))
             end
         elseif signal[5] <= 5 and signal[6] == "pair" and #pairedCard == 0 then
             pair(signal[3])
