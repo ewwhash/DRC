@@ -383,17 +383,19 @@ local function ram(redraw)
     set(47, 1, droneData.ram .. "%", color.black, color.white)
 
     if droneData.ram >= 95 then
-        setColorText(52, 1, "[0xff5555]⠒⠒⠒⠒⠒⠒", color.black)
-    elseif droneData.ram >= 80 then
-        setColorText(52, 1, "[0xff5555]⠒⠒⠒⠒⠒[0x3c3c48]⠒", color.black)
-    elseif droneData.ram >= 60 then
-        setColorText(52, 1, "[0xf2b233]⠒⠒⠒⠒[0x3c3c48]⠒⠒", color.black)
-    elseif droneData.ram >= 40 then 
-        setColorText(52, 1, "[0xf2b233]⠒⠒⠒[0x3c3c48]⠒⠒⠒", color.black)
-    elseif droneData.ram >= 20 then
-        setColorText(52, 1, "[0x7fcc19]⠒⠒[0x3c3c48]⠒⠒⠒⠒", color.black)
+        setColorText(51, 1, "[0xff5555]⠒⠒⠒⠒⠒⠒⠒", color.black)
+    elseif droneData.ram >= 81 then
+        setColorText(51, 1, "[0xff5555]⠒⠒⠒⠒⠒⠒[0x3c3c48]⠒", color.black)
+    elseif droneData.ram >= 67 then
+        setColorText(51, 1, "[0xf2b233]⠒⠒⠒⠒⠒[0x3c3c48]⠒⠒", color.black)
+    elseif droneData.ram >= 50 then 
+        setColorText(51, 1, "[0xf2b233]⠒⠒⠒⠒[0x3c3c48]⠒⠒⠒", color.black)
+    elseif droneData.ram >= 36 then
+        setColorText(51, 1, "[0x7fcc19]⠒⠒⠒[0x3c3c48]⠒⠒⠒⠒", color.black)
+    elseif droneData.ram >= 22 then
+        setColorText(51, 1, "[0x7fcc19]⠒⠒[0x3c3c48]⠒⠒⠒⠒⠒", color.black)
     else
-        setColorText(52, 1, "[0x7fcc19]⠒[0x3c3c48]⠒⠒⠒⠒⠒", color.black)
+        setColorText(51, 1, "[0x7fcc19]⠒[0x3c3c48]⠒⠒⠒⠒⠒⠒", color.black)
     end
 end
 
