@@ -11,7 +11,7 @@ end
 
 local activeSide, activeSlot, port, allModulesReceived, codeExecution, ignore, pairedCard, data, maxModemStrength, maxPacketSize, env = 0, 0, 0, false_, false_, false_, "", "", tonumber_(getDeviceInfo()[modemAddress].width), tonumber_(getDeviceInfo()[modemAddress].capacity) - 128, setmetatable({}, {__index = _G, __metatable = ""})
  
-local function send(...)
+local function sendToTablet(...)
     modem_.send(pairedCard, port, ...)
 end
  
@@ -33,14 +33,14 @@ end
  
 local function stderrPrint(stderr, ...)
     local tableData = table_.pack(...)
-    send("print", stderr, concat(tableData):sub(1, maxPacketSize))
+    sendToTablet("print", stderr, concat(tableData):sub(1, maxPacketSize))
 end
  
 local function sendData()
-    send("data", getAcceleration(), activeSide, activeSlot, drone_.count(), getColor(), computer_.energy() / (computer_.maxEnergy() / 100), (computer_.totalMemory() - computer_.freeMemory()) / (computer_.totalMemory() / 100))
+    sendToTablet("data", getAcceleration(), activeSide, activeSlot, drone_.count(), getColor(), computer_.energy() / (computer_.maxEnergy() / 100), (computer_.totalMemory() - computer_.freeMemory()) / (computer_.totalMemory() / 100))
 
     if not allModulesReceived then
-        send("getModules")
+        sendToTablet("getModules")
         allModulesReceived = true_
     end
 end
@@ -60,7 +60,7 @@ local function pair(modemAddress, unpair)
         if modemAddress then
             pairedCard = modemAddress
             eeprom_.setData(modemAddress .. "," .. port)
-            send("OK")
+            sendToTablet("OK")
             readyState()
         else        
             local data = eeprom_.getData()
@@ -95,7 +95,7 @@ local function checkNumber(number, ifNotValidNumber)
 end
  
 local function getDistanceToUser()
-    send("ping")
+    sendToTablet("ping")
     return checkNumber(select(5, pull(3, true_)), 0)
 end
  
@@ -197,7 +197,7 @@ local function runCode(code, traceback, moduleName)
         codeExecution = false_
     end
 
-    send("r-end")
+    sendToTablet("r-end")
 end
  
 local function loadModule(name, code, command)
@@ -222,14 +222,12 @@ function pull(timeout)
                     table_.insert(args, arg)
                 end
  
-                if cmd[args[1]] and not ignore then
+                if cmd[args[1]] then
                     cmd[args[1]](table_.unpack(args, 2, #args))
                 end
  
                 data = ""
-            elseif signal[6] == "data" then
-                sendData()
-            elseif cmd[signal[6]] and not ignore then
+            elseif cmd[signal[6]] then
                 cmd[signal[6]](table_.unpack(signal, 7, #signal))
             elseif signal[6] == "unpair" then
                 pair(false_, true_)
@@ -255,7 +253,7 @@ function sleep(timeout)
 end
  
 cmd = {
-    move = drone_.move,
+    move = function(...) if not ignore then drone_.move(...) end end,
     swing = function() drone_.swing(activeSide) end,
     place = function() drone_.place(activeSide) end,
     suck = function() if inventorySize() > 1 then for i = 1, inventorySize() do selectSlot(i) drone_.suck(activeSide) end selectSlot(activeSlot) end end,
@@ -270,15 +268,16 @@ cmd = {
     runCode = runCode,
     goToMe = goToUser,
     goToCoords = function(x, y, z) blockMove(0, y, 0) blockMove(x, 0, z) blockMove(0, -y, 0) end,
+    data = sendData,
     loadModule = loadModule
 }
 
-print, move, update, distance, moveToUser, slot = function(...) stderrPrint(false_, ...) end, blockMove, sendData, getDistanceToUser, goToUser, safeSelectSlot
+print, move, send, update, distance, moveToUser, slot = function(...) stderrPrint(false_, ...) end, blockMove, sendToTablet, sendData, getDistanceToUser, goToUser, safeSelectSlot
  
 modem_.setWakeMessage("shutboot")
 safeSelectSlot(1)
 pair()
- 
+
 while true_ do
     pull()
 end
