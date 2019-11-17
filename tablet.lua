@@ -219,6 +219,7 @@ local facings = {
 
 local modules = {
     serialization = {path = "/lib/serialization.lua", cmd = [=[_G["serialization"] = load(module, "@/lib/serialization.lua")()]=]},
+    autoComplete = {cmd = [=[function keys(t) local r={} for k in pairs(t) do table.insert(r,k) end return r end _G.cmd["tab"] = function(contextFromTablet) local func=load("return " .. contextFromTablet) local context = func and func() or {} context = (type(context)=="table") and context or {} send("tab-results",table.concat(keys(context), ",")) end]=]},
     nbsPlayer = {path = "/etc/drc-modules/nbsPlayer.lua", cmd = [=[_G["nbsPlayer"] = module]=], link = "https://raw.githubusercontent.com/ewwhash/DRC/master/modules/NBS/player.lua"},
     nbsParser = {path = "/etc/drc-modules/nbsParser.lua", cmd = [=[_G["nbsParser"] = module]=], link = "https://raw.githubusercontent.com/ewwhash/DRC/master/modules/NBS/parser.lua"},
     nbsFreqtab = {path = "/etc/drc-modules/nbsFreqtab.lua", cmd = [=[_G["nbsFreqtab"] = module]=], link = "https://raw.githubusercontent.com/ewwhash/DRC/master/modules/NBS/freqtab.lua"},
@@ -515,17 +516,19 @@ local function loadModules()
     downloadModules()
 
     for module in pairs(modules) do 
-        local file = io.open(modules[module].path, "r")
+        if modules[module].path then
+            local file = io.open(modules[module].path, "r")
 
-        if not file then
-            io.stderr:write("Unable to open module: " .. module)
-            os.exit()
-        else
-            local strModule = file:read("a")
-            modules[module].data = strModule
+            if not file then
+                io.stderr:write("Unable to open module: " .. module)
+                os.exit()
+            else
+                local strModule = file:read("a")
+                modules[module].data = strModule
+            end
+
+            file:close()
         end
-
-        file:close()
     end
 end
 
@@ -555,21 +558,21 @@ local function replPrint(stderr, data)
     end
 end
 
-local function waitResponse()
+local function waitResponse(e)
     stuff.waitResponse = true
     repeat
-        event.pull(0, "modem_message")
+        local response = event.pull(0, "modem_message")
     until not stuff.interpretation
     stuff.waitResponse = false
 end
 
 map = function(t,f)
-	local out={}
-	for k, v in pairs(t) do
-		local k1,v1=f(k,v)
-		out[k1]=v1
-	end
-	return out
+    local out={}
+    for k, v in pairs(t) do
+        local k1,v1=f(k,v)
+        out[k1]=v1
+    end
+    return out
 end
 
 filterList = function(t, filterIter)
@@ -583,35 +586,36 @@ filterList = function(t, filterIter)
 end
 
 local hintCache={}
- 
+
 local function keysOfTable(context)
-    local r=hintCache[context]
+    local r = hintCache[context]
     if not r then
-        send("tab",context)
-        local response = {event.pull(5, "modem_message")}
-        if response[6]=="tab-results" then
-            r={}
+        send("tab", context)
+        local response = {event.pull(.2, "modem_message")}
+        if response[6] == "tab-results" then
+            r = {}
             for i in response[7]:gmatch("[A-z][A-z0-9]*") do
-                table.insert(r,i)
+                table.insert(r, i)
             end
-            hintCache[context]=r
+            hintCache[context] = r
         end
     end
+
     return r
 end
- 
+
 local history = {
     hint = function(line, index)
         line = line or ""
         local tail = line:sub(index)
         line = line:sub(1, index - 1)
-		local lastIndexOfDot=line:reverse():find("%.") or -1
-		
+        local lastIndexOfDot=line:reverse():find("%.") or -1
+
         local context=line:sub(1,-lastIndexOfDot-1)
         local fragment = (lastIndexOfDot == -1) and line or line:sub(#line-lastIndexOfDot+2)
-		
-		context = (context=="") and "_G" or context
-		return map(filterList(keysOfTable(context),function(v) return v:find(fragment)==1 end),function(k,v)return k, ((context=="_G") and "" or context..".")..v..tail end)
+
+        context = (context=="") and "_G" or context
+        return map(filterList(keysOfTable(context),function(v) return v:find(fragment)==1 end),function(k,v)return k, ((context=="_G") and "" or context..".")..v..tail end)
     end
 }
 
@@ -678,7 +682,7 @@ local function updateData(response)
         send("data")
         connectionLostTimer = event.timer(5, connectionLost)
         stuff.requesting = true
-    elseif response then
+    elseif response and type(response) == "table" and response[1] then
         if connectionLostTimer then
             event.cancel(connectionLostTimer)
         end
