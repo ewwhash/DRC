@@ -88,7 +88,7 @@ local function parseArgs()
 end
  
 parseArgs()
-chunkSend("runCode", code)
+chunkSend("runCode", code, "true")
  
 while true do
     local evt = {event.pull()}
