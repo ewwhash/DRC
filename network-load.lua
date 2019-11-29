@@ -37,7 +37,7 @@ local function chunkSend(...)
             send(table.unpack(data))
         end
  
-        io.write("File sent. Press CTRL+D for interrupt, Q for exit.\n\n")
+        io.write("File sent. Press CTRL+D for interrupt, Q for exit.\n")
     end
 end
  
